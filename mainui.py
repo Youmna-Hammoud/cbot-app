@@ -21,7 +21,7 @@ def init_session_state():
 def apply_styles():
     st.markdown("""
         <div style="position: fixed; top: 60px; right: 20px; z-index: 999; display: flex; gap: 10px; align-items: center;">
-            <a href="tel:112" target="_blank" style="
+            <a href="tel:1564" target="_blank" style="
                 padding: 10px;
                 font-size: 18px;
                 color: white;
