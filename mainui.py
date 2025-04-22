@@ -12,7 +12,8 @@ def init_session_state():
         "emergency_contact": {},
         "selected_chat": "Chat 1",
         "logged_in": False,
-        "current_user": None
+        "current_user": None,
+        "show_em_form": False
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -83,22 +84,32 @@ def display_chat_messages(chat_sessions, selected_chat):
 
 def display_chat_sidebar():
     with st.sidebar:
-        submit_em = st.button("Emergency")
-        if submit_em:
+        if st.button("Emergency"):
+            st.session_state.show_em_form = True
 
-            with st.form("emergency_form", clear_on_submit=True):
-                name = st.text_input("Contact username (on telegram)", key="em_name")
-                st.html("<h6>Make sure your contact started the chat with our <a href='https://t.me/cbot_emergency_bot'>bot on telegram</a></h6>")
-                submitted = st.form_submit_button("Save Contact")
-                if submitted:
-                    submit_em = True
-                    if name:
-                        st.session_state.emergency_contact = {
-                            "name": name}
-                        check_emergency(name, st.session_state.current_user)
-                        st.success("Emergency contact saved.")
-                    else:
-                        st.error("Please fill out all fields.")
+            if st.session_state.show_em_form:
+                with st.form("emergency_form", clear_on_submit=True):
+                    username = st.text_input(
+                        "Contact username (on telegram)", 
+                        key="em_name"
+                    )
+                    st.markdown(
+                        "<h6>Make sure your contact started the chat with our <a href='https://t.me/cbot_emergency_bot'>bot on telegram</a></h6>",
+                        unsafe_allow_html=True
+                    )
+                    submitted = st.form_submit_button("Save Contact")
+
+                    if submitted:
+                        if username:
+                            st.session_state.emergency_contact = { "name": username }
+                            try:
+                                check_emergency(username, st.session_state.current_user)
+                                st.success("Emergency contact saved.")
+                                st.session_state.show_em_form = False
+                            except Exception as e:
+                                st.error(f"Failed to register emergency contact: {e}")
+                        else:
+                            st.error("Please fill out all fields.")
 
         # Show emergency contact
         if st.session_state.emergency_contact:
