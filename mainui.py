@@ -4,7 +4,7 @@ from telegram_bot import check_emergency
 def init_session_state():
     defaults = {
         "page": "Home",
-        "chat_sessions": {},
+        "chat_sessions": {"Chat 1": []},
         "message_count": 0,
         "user_input": "",
         "mood_before": None,
@@ -18,6 +18,9 @@ def init_session_state():
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+    if "selected_chat" not in st.session_state or st.session_state["selected_chat"] not in st.session_state["chat_sessions"]:
+        st.session_state["selected_chat"] = list(st.session_state["chat_sessions"].keys())[0]
 
 def apply_styles():
     st.markdown("""
@@ -91,8 +94,7 @@ def display_chat_sidebar():
             with st.form("emergency_form", clear_on_submit=True):
                 name = st.text_input("Contact username (on telegram)", key="em_name")
                 st.markdown(
-                    "<h6>Make sure your contact started the chat with our "
-                    "<a href='https://t.me/cbot_emergency_bot'>bot on telegram</a></h6>",
+                    "<h6>Make sure your contact started the chat with our <a href='https://t.me/cbot_emergency_bot'>bot on telegram</a> and have a telegram username</h6>",
                     unsafe_allow_html=True
                 )
                 submitted = st.form_submit_button("Save Contact")
@@ -103,8 +105,8 @@ def display_chat_sidebar():
                             check_emergency(name, st.session_state.current_user)
                             st.success("Emergency contact saved.")
                             st.session_state.show_em_form = False
-                        except Exception as e:
-                            st.error(f"Failed to register emergency contact: {e}")
+                        except Exception:
+                            st.error(f"Failed to register emergency contact")
                     else:
                         st.error("Please fill out all fields.")
 
@@ -121,6 +123,7 @@ def display_chat_sidebar():
                     box-shadow: 0 1px 5px rgba(0,0,0,0.1);
                     color: #5D3A3A;
                     margin-top: 10px;
+                    margin-bottom: 10px;
                     display: flex;
                     align-items: center;
                     gap: 10px;
@@ -192,4 +195,11 @@ def check_mood_after():
                 st.write("Thank you for chatting with me today. Take care! 💜")
                 st.stop()
         else:
-            st.write("I'm still here for you. Let's keep talking 💬") 
+            st.write("I'm still here for you. Let's keep talking 💬")
+            if st.session_state.mood_after <= 3:
+                if st.session_state.emergency_contact:
+                    try:
+                        check_emergency(st.session_state.emergency_contact["name"], st.session_state.current_user)
+                        st.warning("Your emergency contact has been notified. You're not alone. 💜")
+                    except Exception as e:
+                        st.error(f"Failed to notify emergency contact: {e}")

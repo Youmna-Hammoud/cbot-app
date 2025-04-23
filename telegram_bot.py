@@ -19,14 +19,18 @@ def add_contacts():
     response = requests.get(url).json()
 
     if response["ok"] == True:
-        for message in response["result"]:
-            chat_id = message["message"]["from"]["id"]
-            first_name = message["message"]["from"]["first_name"]
-            last_name = message["message"]["from"]["last_name"]
-            try:
-                username = message["message"]["from"]["username"]
-            except KeyError:
-                username = None
+        for message in response.get("result", []):
+            user_info = message.get("message", {}).get("from", {})
+            chat_id = user_info.get("id")
+            first_name = user_info.get("first_name")
+            last_name = user_info.get("last_name")
+            username = user_info.get("username")
+
+            if not all([chat_id, first_name, last_name]):
+                continue 
+            if not username:
+                send_message(chat_id, "Please make sure your account has a username, then send a message to be added as an emergency contact.")
+                continue
             ids=[]
             for contact in contacts.find({"chat_id" : {"$exists" : True}}):
                 ids.append(contact["chat_id"])
@@ -63,10 +67,10 @@ def send_verification(contacts, current_user):
     
         res = requests.post(url2, data=data)
 
-        if res.status_code == 200:
+        '''if res.status_code == 200:
             st.success("Message sent successfully!")
         else:
-            st.error("Failed to send message")
+            st.error("Failed to send message")'''
 
 def check_emergency(username, current_user):
     add_contacts()
@@ -87,12 +91,18 @@ def send_emergency(contacts, current_user, user_message):
     
         res = requests.post(url2, data=data)
 
-        if res.status_code == 200:
+        '''if res.status_code == 200:
             st.success("Message sent successfully!")
         else:
-            st.error("Failed to send message")
+            st.error("Failed to send message")'''
+def send_message(chat_id, message):
 
+    url2 = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
+    data = {
+        "chat_id": chat_id,
+        "text": message
+    }
 
-if __name__ == "__main__":
-    check_emergency("youmnahammoud", get_user("youmna@gmail.com"))
+    
+    requests.post(url2, data=data)
