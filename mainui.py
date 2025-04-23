@@ -1,5 +1,7 @@
 import streamlit as st
 from telegram_bot import check_emergency
+from bot import initialize_chat, generate_response
+from emergency import detector
 
 def init_session_state():
     defaults = {
@@ -110,8 +112,6 @@ def display_chat_sidebar():
                     else:
                         st.error("Please fill out all fields.")
 
-
-        # Show emergency contact
         if st.session_state.emergency_contact:
             st.markdown("### 📞 Emergency Contact")
             contact = st.session_state.emergency_contact
@@ -136,8 +136,10 @@ def display_chat_sidebar():
             """, unsafe_allow_html=True)
 
         if st.button("Reset Chat"):
-            st.session_state.chat_sessions = {}
+            st.session_state.chat_sessions = {"Chat 1": []}
+            st.session_state.selected_chat = "Chat 1"
             st.session_state.message_count = 0
+            st.write("Chat reset complete.")
 
         st.sidebar.markdown("## 💬 Chats")
         if not st.session_state.chat_sessions:
@@ -145,7 +147,6 @@ def display_chat_sidebar():
 
         chat_names = list(st.session_state.chat_sessions.keys())
 
-        # Fix: Make sure the selected chat exists
         if st.session_state.selected_chat not in chat_names:
             st.session_state.selected_chat = chat_names[0]
 
@@ -153,19 +154,17 @@ def display_chat_sidebar():
             "Select Chat", chat_names, index=chat_names.index(st.session_state.selected_chat)
         )
 
-
         if st.button("➕ New Chat"):
             new_chat_name = f"Chat {len(st.session_state.chat_sessions) + 1}"
             st.session_state.chat_sessions[new_chat_name] = []
-            st.session_state.selected_chat = new_chat_name
-            st.rerun()
+            st.session_state.selected_chat = new_chat_name 
+            st.rerun() 
 
         new_name = st.text_input("Rename selected chat", value=st.session_state.selected_chat)
         if st.button("Rename Chat") and new_name:
             if new_name not in st.session_state.chat_sessions:
                 st.session_state.chat_sessions[new_name] = st.session_state.chat_sessions.pop(st.session_state.selected_chat)
-                st.session_state.selected_chat = new_name
-                st.rerun()
+                st.session_state.selected_chat = new_name 
             else:
                 st.warning("Chat name already exists.")
 
@@ -173,7 +172,6 @@ def display_chat_sidebar():
             if len(st.session_state.chat_sessions) > 1:
                 st.session_state.chat_sessions.pop(st.session_state.selected_chat)
                 st.session_state.selected_chat = list(st.session_state.chat_sessions.keys())[0]
-                st.rerun()
             else:
                 st.warning("You must have at least one chat.")
 
@@ -203,3 +201,33 @@ def check_mood_after():
                         st.warning("Your emergency contact has been notified. You're not alone. 💜")
                     except Exception as e:
                         st.error(f"Failed to notify emergency contact: {e}")
+
+def display_main_chat_interface():
+    st.title("Welcome to C-Bot, your mental health Chat-Bot!!💜")
+
+    # Get initial mood rating
+    mood = get_mood_rating()
+    if mood is not None:
+        initialize_chat(st.session_state.current_user["_id"])
+
+    st.write("Hello, I'm C-Bot. What's on your mind today? 😊")
+
+    # Use the currently selected chat from the sidebar
+    selected_chat = st.session_state.selected_chat
+
+    # Display chat messages
+    display_chat_messages(st.session_state.chat_sessions, selected_chat)
+
+    # Create a form for chat input
+    chat_form = st.form(key="chat_form", clear_on_submit=True)
+    with chat_form:
+        user_input = st.text_input("Tell me anything...", key="user_input", label_visibility="collapsed")
+        submit_button = st.form_submit_button("Send")
+
+    if submit_button and user_input:
+        generate_response(user_input, st.session_state.chat_sessions, selected_chat, st.session_state.current_user)
+        detector([user_input], st.session_state.current_user)
+        st.rerun()
+
+    # Check mood after conversation
+    check_mood_after()
