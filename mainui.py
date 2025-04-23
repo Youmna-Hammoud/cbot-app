@@ -186,14 +186,11 @@ def check_mood_after():
     if st.session_state.message_count >= 10:
         if "mood_after" not in st.session_state or st.session_state.mood_after is None:
             st.session_state.mood_after = st.slider("How do you feel after chatting?", 1, 10, 5)
+            st.session_state.show_mood_after = True
+        elif st.session_state.get("show_mood_after", False):
+            st.session_state.mood_after = st.slider("How do you feel after chatting?", 1, 10, st.session_state.mood_after)
 
-        if st.session_state.mood_after >= 7:
-            continue_chat = st.radio("You're feeling better! 😊 Do you want to keep chatting?", ["Yes", "No"])
-            if continue_chat == "No":
-                st.write("Thank you for chatting with me today. Take care! 💜")
-                st.stop()
-        else:
-            st.write("I'm still here for you. Let's keep talking 💬")
+        if st.session_state.mood_after is not None:
             if st.session_state.mood_after <= 3:
                 if st.session_state.emergency_contact:
                     try:
@@ -201,6 +198,14 @@ def check_mood_after():
                         st.warning("Your emergency contact has been notified. You're not alone. 💜")
                     except Exception as e:
                         st.error(f"Failed to notify emergency contact: {e}")
+                st.write("I'm still here for you. Let's keep talking 💬")
+            elif st.session_state.mood_after >= 7:
+                continue_chat = st.radio("You're feeling better! 😊 Do you want to keep chatting?", ["Yes", "No"])
+                if continue_chat == "No":
+                    st.write("Thank you for chatting with me today. Take care! 💜")
+                    st.stop()
+            else:
+                st.write("I'm still here for you. Let's keep talking 💬")
 
 def display_main_chat_interface():
     st.title("Welcome to C-Bot, your mental health Chat-Bot!!💜")
@@ -227,6 +232,7 @@ def display_main_chat_interface():
     if submit_button and user_input:
         generate_response(user_input, st.session_state.chat_sessions, selected_chat, st.session_state.current_user)
         detector([user_input], st.session_state.current_user)
+        st.session_state.message_count += 1
         st.rerun()
 
     # Check mood after conversation

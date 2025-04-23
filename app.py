@@ -1,5 +1,5 @@
 import streamlit as st
-from mainui import init_session_state, apply_styles, display_chat_messages, display_chat_sidebar, get_mood_rating, check_mood_after, display_main_chat_interface
+from mainui import init_session_state, apply_styles, display_chat_sidebar, display_main_chat_interface
 from authui import signup_ui, login_ui
 
 def main():
