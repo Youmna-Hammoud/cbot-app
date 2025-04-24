@@ -2,6 +2,7 @@ import streamlit as st
 from telegram_bot import check_emergency
 from bot import initialize_chat, generate_response
 from emergency import detector
+from mood_analytics import mood_detector, calculate_user_mood_summary, convert_mood, save_user_mood_score
 
 def init_session_state():
     defaults = {
@@ -89,6 +90,13 @@ def display_chat_messages(chat_sessions, selected_chat):
 
 def display_chat_sidebar():
     with st.sidebar:
+        with st.expander("Mood Logs"):
+            try:
+                avg_mood_score, improvement_percent = calculate_user_mood_summary(st.session_state.current_user["_id"])
+            except ValueError as e:
+                st.markdown(f"<b>{e}</b>", unsafe_allow_html=True)
+            st.markdown(f"<b>Average Mood Score:</b>{avg_mood_score:.2f} <br> <b>Improvement:</b> {improvement_percent:.2f}% this week!", unsafe_allow_html=True)
+
         if st.button("Emergency"):
             st.session_state.show_em_form = True
 
@@ -191,6 +199,7 @@ def check_mood_after():
             st.session_state.mood_after = st.slider("How do you feel after chatting?", 1, 10, st.session_state.mood_after)
 
         if st.session_state.mood_after is not None:
+            save_user_mood_score(convert_mood(st.session_state.mood_after, st.session_state.current_user))
             if st.session_state.mood_after <= 3:
                 if st.session_state.emergency_contact:
                     try:
@@ -213,6 +222,7 @@ def display_main_chat_interface():
     # Get initial mood rating
     mood = get_mood_rating()
     if mood is not None:
+        save_user_mood_score(convert_mood(mood), st.session_state.current_user)
         initialize_chat(st.session_state.current_user["_id"])
 
     st.write("Hello, I'm C-Bot. What's on your mind today? 😊")
@@ -232,6 +242,7 @@ def display_main_chat_interface():
     if submit_button and user_input:
         generate_response(user_input, st.session_state.chat_sessions, selected_chat, st.session_state.current_user)
         detector([user_input], st.session_state.current_user)
+        mood_detector([user_input], st.session_state.current_user)
         st.session_state.message_count += 1
         st.rerun()
 

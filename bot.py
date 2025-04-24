@@ -35,10 +35,6 @@ def initialize_chat(user_id):
     previous_messages = get_user_messages(user_id)
     messages = [{"role": "system", "content": system_message}]
     
-    # Add mood information if available
-    if st.session_state.mood_before is not None:
-        messages.append({"role": "system", "content": f"user mood is {st.session_state.mood_before}"})
-    
     # Add previous messages
     messages.extend(previous_messages)
     return messages
