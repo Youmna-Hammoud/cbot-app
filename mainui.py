@@ -93,10 +93,11 @@ def display_chat_sidebar():
         with st.expander("Mood Logs"):
             try:
                 avg_mood_score, improvement_percent = calculate_user_mood_summary(st.session_state.current_user["_id"])
+                if avg_mood_score and improvement_percent:
+                    st.markdown(f"<b>Average Mood Score:</b>{avg_mood_score:.2f} <br> <b>Improvement:</b> {improvement_percent:.2f}% this week!", unsafe_allow_html=True)
             except ValueError as e:
                 st.markdown(f"<b>{e}</b>", unsafe_allow_html=True)
-            st.markdown(f"<b>Average Mood Score:</b>{avg_mood_score:.2f} <br> <b>Improvement:</b> {improvement_percent:.2f}% this week!", unsafe_allow_html=True)
-
+        
         if st.button("Emergency"):
             st.session_state.show_em_form = True
 
