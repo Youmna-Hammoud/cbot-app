@@ -10,8 +10,8 @@ if 'current_user' not in st.session_state:
 def login_ui():
     st.title("Login")
     with st.form(key="login"):
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
+        email = st.text_input("Email").strip()
+        password = st.text_input("Password", type="password").strip()
         submit_button = st.form_submit_button("Login")
 
     if submit_button:
@@ -30,10 +30,10 @@ def login_ui():
 def signup_ui():
     st.title("Sign Up")
     with st.form(key="signup"):
-        username = st.text_input("Username")
-        email = st.text_input("Email")
-        password1 = st.text_input("Password", type="password")
-        password2 = st.text_input("Verify Password", type="password")
+        username = st.text_input("Username").strip()
+        email = st.text_input("Email").strip()
+        password1 = st.text_input("Password", type="password").strip()
+        password2 = st.text_input("Verify Password", type="password").strip()
         submit_button = st.form_submit_button("Sign Up")
 
     if submit_button:
