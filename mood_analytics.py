@@ -91,7 +91,7 @@ def calculate_improvement(user_id, current_avg_score):
 
     # Improvement is calculated based on the difference in average scores
     improvement = current_avg_score - prev_avg_score
-    improvement_percent = (improvement /abs(prev_avg_score)) * 100  # Mood score is between -2 and 2
+    improvement_percent = ((improvement /abs(prev_avg_score)) * 100 ) if prev_avg_score != 0 else improvement
 
     return improvement_percent
 
