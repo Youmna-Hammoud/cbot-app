@@ -23,6 +23,7 @@
 ```bash
 git clone https://github.com/Youmna-Hammoud/cbot.git
 cd cbot
+```
 
 ### 2. Install dependencies
 
@@ -30,6 +31,7 @@ Make sure you have Python 3.8 or higher installed.
 
 ```bash
 pip install -r requirements.txt
+```
 
 ### 3. Configure secrets
 
@@ -42,6 +44,7 @@ TOKEN = "your_telegram_bot_token"
 
 EMERGENCY1 = "emergency_model_id"
 MOOD1 = "mood_classification_model_id"
+```
 
 
 > These secrets are securely accessed by Streamlit during runtime.
@@ -52,6 +55,7 @@ MOOD1 = "mood_classification_model_id"
 
 ```bash
 streamlit run app.py
+```
 
 
 ---
