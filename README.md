@@ -1,45 +1,41 @@
-C-BoT
+# C-BoT
 
-C-BoT is an AI-powered cognitive behavioral therapy (CBT) chatbot designed to support users through mood tracking, therapeutic exercises, and conversation. Built using Streamlit, it offers an intuitive interface and connects to external APIs and databases for a seamless experience.
+**C-BoT** is an AI-powered cognitive behavioral therapy (CBT) chatbot designed to support users through mood tracking, therapeutic exercises, and guided conversations. Built with Streamlit, it integrates with Cohere, MongoDB, and Telegram for a seamless experience.
 
-Live App: cbot-app.streamlit.app
-
-
----
-
-Features
-
-Mood classification and tracking
-
-CBT-based chatbot interactions
-
-Telegram integration for messaging
-
-Secure handling of credentials via Streamlit secrets
-
-Uses Cohere models for text classification and generation
-
-
+**Live App:** [https://cbot-app.streamlit.app](https://cbot-app.streamlit.app)
 
 ---
 
-Getting Started
+## Features
 
-1. Clone the repository
+- Mood classification and tracking  
+- Structured CBT-style chatbot conversations  
+- Telegram integration  
+- Cohere-powered NLP (generation + classification)  
+- Secure credential handling via Streamlit secrets
 
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
 git clone https://github.com/Youmna-Hammoud/cbot.git
 cd cbot
 
-2. Install dependencies
+### 2. Install dependencies
 
-Make sure Python 3.8+ is installed. Then run:
+Make sure you have Python 3.8 or higher installed.
 
+```bash
 pip install -r requirements.txt
 
-3. Set up secrets
+### 3. Configure secrets
 
-Create a file at .streamlit/secrets.toml with the following structure:
+Create a file at .streamlit/secrets.toml with the following content:
 
+```bash
 COHERE_API_KEY = "your_cohere_api_key"
 MONGO_URI = "your_mongodb_connection_uri"
 TOKEN = "your_telegram_bot_token"
@@ -48,24 +44,21 @@ EMERGENCY1 = "emergency_model_id"
 MOOD1 = "mood_classification_model_id"
 
 
-
-> Note: These secrets are securely read by Streamlit and not exposed in the frontend.
-
+> These secrets are securely accessed by Streamlit during runtime.
 
 
-4. Run the app
 
-Launch the app locally using Streamlit:
+### 4. Run the app
 
+```bash
 streamlit run app.py
 
 
 ---
 
-Deployment
+## Deployment
 
-The app is live and accessible at:
+The app is live at:
 https://cbot-app.streamlit.app
 
 
----
